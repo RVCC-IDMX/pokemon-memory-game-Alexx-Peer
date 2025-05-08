@@ -135,6 +135,14 @@ header p {
   box-shadow: 0 0 10px rgba(52, 152, 219, 0.6);
 }
 
+/* card style for matched cards */
+.card.matched {
+  border: 3px solid green;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
 .card-inner {
   position: relative;
   width: 100%;

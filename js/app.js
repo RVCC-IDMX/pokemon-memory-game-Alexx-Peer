@@ -245,11 +245,45 @@ let isProcessingPair = false;
 
 function handleCardClick(event) {
   // Find the clicked card
-  const card = event.target.closest('.card');
+  let card = event.target;
+  while (card && !card.classList.contains('card')) {
+    card = card.parentElement;
+  }
 
-  // Early return pattern for better readability
-  if (!card) {
-    return; // Not a card or child of card
+  if (!card || card.classList.contains('flipped') || isProcessingPair) {
+    return;
+  }
+
+  // Flip the card
+  card.classList.add('flipped');
+
+  // Track selections
+  if (!firstSelectedCard) {
+    // First card selection
+    firstSelectedCard = card;
+  } else if (firstSelectedCard !== card) {
+    // Second card selection
+    secondSelectedCard = card;
+    checkForMatch();
+  }
+}
+
+function checkForMatch() {
+  let firstPokemonData, secondPokemonData;
+
+  try {
+    firstPokemonData = JSON.parse(firstSelectedCard.dataset.pokemon);
+    secondPokemonData = JSON.parse(secondSelectedCard.dataset.pokemon);
+  } catch (error) {
+    console.error('Error parsing Pokémon data:', error);
+    resetSelection();
+    return;
+  }
+
+  if (!firstPokemonData || !secondPokemonData) {
+    console.error('Missing Pokémon data');
+    resetSelection();
+    return;
   }
 
   // Guard clauses for better readability
@@ -288,6 +322,37 @@ function handleCardClick(event) {
       isProcessingPair = false; // lets you interact w/ new cards
     }, 1000); //  add delay
   }
+}
+
+if (firstPokemonData.id === secondPokemonData.id) {
+  handleMatch();
+} else {
+  handleNonMatch();
+}
+}
+
+function handleMatch() {
+  // Keep cards flipped if they match
+  firstSelectedCard.classList.add('match');
+  secondSelectedCard.classList.add('match');
+  resetSelection();
+}
+
+function handleNonMatch() {
+  isProcessingPair = true;
+
+  setTimeout(() => {
+    firstSelectedCard.classList.remove('flipped');
+    secondSelectedCard.classList.remove('flipped');
+
+    resetSelection();
+    isProcessingPair = false;
+  }, 1000);
+}
+
+function resetSelection() {
+  firstSelectedCard = null;
+  secondSelectedCard = null;
 }
 
 
