@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /**
  * Main Application Logic - Simplified Version
  * This file contains the main functionality for the Pokemon Card Flip App
@@ -210,20 +211,60 @@ function assignPokemonToCard(card, pokemon) {
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Event | MDN: Event}
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/classList | MDN: classList}
  */
+
+// State tracking variables
+let firstSelectedCard = null;
+let secondSelectedCard = null;
+// Flag to prevent interaction during card processing
+let isProcessingPair = false;
+
 function handleCardClick(event) {
   // Find the clicked card
-  let card = event.target;
-  while (card && !card.classList.contains('card')) {
-    card = card.parentElement;
-  }
+  const card = event.target.closest('.card');
 
+  // Early return pattern for better readability
   if (!card) {
-    return;
+    return; // Not a card or child of card
   }
 
-  // Toggle card flip
+  // Guard clauses for better readability
+  if (isProcessingPair || card.classList.contains('flipped') || card.classList.contains('matched')) {
+    return; // Already flipped or matched, or processing
+  }
+  // sets card as 'selected' for visual cue
   card.classList.toggle('flipped');
+
+  // Flip the card
+  card.classList.add('flipped');
+
+  // Implement selection tracking
+  if (!firstSelectedCard) {
+    // if no card selected yet, assign this card as first
+    firstSelectedCard = card;
+  } else {
+    // assign card as second only if it's differnt from first
+    secondSelectedCard = card;
+    isProcessingPair = true; // start processing
+
+    // check if both selected cards match
+    setTimeout(() => {
+      if (firstSelectedCard.dataset.cardType === secondSelectedCard.dataset.cardType) {
+        // if match, mark as matched
+        firstSelectedCard.classList.add('matched');
+        secondSelectedCard.classList.add('matched');
+      } else {
+        // if no match, flip back over
+        firstSelectedCard.classList.remove('flipped');
+        secondSelectedCard.classList.remove('flipped');
+      }
+      // reset selected cards
+      firstSelectedCard = null;
+      secondSelectedCard = null;
+      isProcessingPair = false; // lets you interact w/ new cards
+    }, 1000); //  add delay
+  }
 }
+
 
 /**
  * Set up event listeners
