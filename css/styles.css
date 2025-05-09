@@ -130,14 +130,14 @@ header p {
 
 /* styles for selected cards */
 .card.flipped {
-  border: 2px solid #3498db;
+  border: 8px solid #3498db;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(52, 152, 219, 0.6);
 }
 
 /* card style for matched cards */
-.card.matched {
-  border: 3px solid green;
+.card.match {
+  border: 8px solid green;
   border-radius: 12px;
   box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
   transition: border 0.3s ease, box-shadow 0.3s ease;
@@ -185,7 +185,6 @@ header p {
 .card-back {
   background-color: var(--card-bg);
   transform: rotateY(180deg);
-  border: 8px solid var(--secondary);
   justify-content: space-between;
 }
 

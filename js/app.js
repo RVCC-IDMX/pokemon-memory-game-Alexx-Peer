@@ -150,7 +150,6 @@ function shuffleArray(array) {
     const j = Math.floor(Math.random() * (i + 1));
     [arrayCopy[i], arrayCopy[j]] = [arrayCopy[j], arrayCopy[i]];
   }
-
   return arrayCopy;
 }
 
@@ -238,7 +237,7 @@ function assignPokemonToCard(card, pokemon) {
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/classList | MDN: classList}
  */
 
-// State tracking variables
+// State-tracking variables
 let firstSelectedCard = null;
 let secondSelectedCard = null;
 // Flag to prevent interaction during card processing
@@ -266,21 +265,17 @@ function handleCardClick(event) {
   if (!firstSelectedCard) {
     // First card selection
     firstSelectedCard = card;
-  } else {
+  } else if (firstSelectedCard !== card) {
     // Second card selection
     secondSelectedCard = card;
     isProcessingPair = true;
-
-    // added delay after 2nd card picked before checking for match
-    setTimeout(() => {
-      checkForMatch();
-    }, 1000);
+    checkForMatch();
   }
 }
 
+// check if two selected cards match
 function checkForMatch() {
-  const firstData = JSON.parse(firstSelectedCard.dataset.pokemon);
-  const secondData = JSON.parse(secondSelectedCard.dataset.pokemon);
+  let firstPokemonData, secondPokemonData;
 
   try {
     firstPokemonData = JSON.parse(firstSelectedCard.dataset.pokemon);
@@ -291,15 +286,22 @@ function checkForMatch() {
     return;
   }
 
+  if (!firstPokemonData || !secondPokemonData) {
+    console.error('Missing Pokémon data');
+    resetSelection();
+    return;
+  }
+
   setTimeout(() => {
-    if (firstData.id === secondData.id) {
+    if (firstPokemonData.id === secondPokemonData.id) {
       handleMatch();
     } else {
       handleNonMatch();
     }
-  }, 1000);
+  }, 250);   //delay before match-checking
 }
 
+// handle matching cards
 function handleMatch() {
   // Keep cards flipped if they match
   firstSelectedCard.classList.add('match');
@@ -307,16 +309,16 @@ function handleMatch() {
   resetSelection();
 }
 
+// handle non-matching cards
 function handleNonMatch() {
   setTimeout(() => {
     firstSelectedCard.classList.remove('flipped');
     secondSelectedCard.classList.remove('flipped');
-
     resetSelection();
-  }, 1000);
+  }, 500); // delay if cards are not matched
 }
 
-
+// reset card selection
 function resetSelection() {
   firstSelectedCard = null;
   secondSelectedCard = null;
