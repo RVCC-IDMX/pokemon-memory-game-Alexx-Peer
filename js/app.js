@@ -1,4 +1,5 @@
 /* eslint-disable max-len */
+
 /**
  * Main Application Logic - Simplified Version
  * This file contains the main functionality for the Pokemon Card Flip App
@@ -17,7 +18,7 @@ let cards = [];
 
 // Debug flag - set to true to simulate slower loading
 const DEBUG_SHOW_SPINNER = false;
-const LOADING_DELAY = 4000; // 2 seconds delay
+const LOADING_DELAY = 2000; // 2 seconds delay
 
 /**
  * Initialize the application
@@ -244,13 +245,17 @@ let secondSelectedCard = null;
 let isProcessingPair = false;
 
 function handleCardClick(event) {
-  // Find the clicked card
-  let card = event.target;
-  while (card && !card.classList.contains('card')) {
-    card = card.parentElement;
+
+  //find the clicked card
+  const card = event.target.closest('.card');
+
+  // return if it's not a valid card
+  if (!card || isProcessingPair) {
+    return;
   }
 
-  if (!card || card.classList.contains('flipped') || isProcessingPair) {
+  // prevent selecting the card if it's already flipped or matched
+  if (card.classList.contains('flipped') || card === firstSelectedCard || card === secondSelectedCard) {
     return;
   }
 
@@ -261,15 +266,21 @@ function handleCardClick(event) {
   if (!firstSelectedCard) {
     // First card selection
     firstSelectedCard = card;
-  } else if (firstSelectedCard !== card) {
+  } else {
     // Second card selection
     secondSelectedCard = card;
-    checkForMatch();
+    isProcessingPair = true;
+
+    // added delay after 2nd card picked before checking for match
+    setTimeout(() => {
+      checkForMatch();
+    }, 1000);
   }
 }
 
 function checkForMatch() {
-  let firstPokemonData, secondPokemonData;
+  const firstData = JSON.parse(firstSelectedCard.dataset.pokemon);
+  const secondData = JSON.parse(secondSelectedCard.dataset.pokemon);
 
   try {
     firstPokemonData = JSON.parse(firstSelectedCard.dataset.pokemon);
@@ -280,55 +291,13 @@ function checkForMatch() {
     return;
   }
 
-  if (!firstPokemonData || !secondPokemonData) {
-    console.error('Missing Pokémon data');
-    resetSelection();
-    return;
-  }
-
-  // Guard clauses for better readability
-  if (isProcessingPair || card.classList.contains('flipped') || card.classList.contains('matched')) {
-    return; // Already flipped or matched, or processing
-  }
-  // sets card as 'selected' for visual cue
-  card.classList.toggle('flipped');
-
-  // Flip the card
-  card.classList.add('flipped');
-
-  // Implement selection tracking
-  if (!firstSelectedCard) {
-    // if no card selected yet, assign this card as first
-    firstSelectedCard = card;
-  } else {
-    // assign card as second only if it's differnt from first
-    secondSelectedCard = card;
-    isProcessingPair = true; // start processing
-
-    // check if both selected cards match
-    setTimeout(() => {
-      if (firstSelectedCard.dataset.cardType === secondSelectedCard.dataset.cardType) {
-        // if match, mark as matched
-        firstSelectedCard.classList.add('matched');
-        secondSelectedCard.classList.add('matched');
-      } else {
-        // if no match, flip back over
-        firstSelectedCard.classList.remove('flipped');
-        secondSelectedCard.classList.remove('flipped');
-      }
-      // reset selected cards
-      firstSelectedCard = null;
-      secondSelectedCard = null;
-      isProcessingPair = false; // lets you interact w/ new cards
-    }, 1000); //  add delay
-  }
-}
-
-if (firstPokemonData.id === secondPokemonData.id) {
-  handleMatch();
-} else {
-  handleNonMatch();
-}
+  setTimeout(() => {
+    if (firstData.id === secondData.id) {
+      handleMatch();
+    } else {
+      handleNonMatch();
+    }
+  }, 1000);
 }
 
 function handleMatch() {
@@ -339,20 +308,19 @@ function handleMatch() {
 }
 
 function handleNonMatch() {
-  isProcessingPair = true;
-
   setTimeout(() => {
     firstSelectedCard.classList.remove('flipped');
     secondSelectedCard.classList.remove('flipped');
 
     resetSelection();
-    isProcessingPair = false;
   }, 1000);
 }
+
 
 function resetSelection() {
   firstSelectedCard = null;
   secondSelectedCard = null;
+  isProcessingPair = false;
 }
 
 
