@@ -12,9 +12,10 @@ const loadingSpinner = document.getElementById('loading-spinner');
 
 // Constants
 const CARD_COUNT = 12;
-
+const TOTAL_PAIRS = 6;
 // Application State
 let cards = [];
+let matchedPairs = 0;
 
 // Debug flag - set to true to simulate slower loading
 const DEBUG_SHOW_SPINNER = false;
@@ -136,7 +137,7 @@ async function fetchAndAssignPokemon() {
   } catch (error) {
     console.error('Error fetching and assigning Pokemon:', error);
     // error handling
-    showErrorMessage('Failed to load Pokémon. Please try refreshing the page.');
+    console.error('Failed to load Pokémon. Please try refreshing the page.');
   }
 }
 
@@ -306,6 +307,13 @@ function handleMatch() {
   // Keep cards flipped if they match
   firstSelectedCard.classList.add('match');
   secondSelectedCard.classList.add('match');
+
+  // Increment matched pairs count
+  matchedPairs++;
+
+  // Check if the game is complete
+  checkGameCompletion();
+
   resetSelection();
 }
 
@@ -323,6 +331,37 @@ function resetSelection() {
   firstSelectedCard = null;
   secondSelectedCard = null;
   isProcessingPair = false;
+}
+
+// Function to check if all pairs have been matched
+function checkGameCompletion() {
+  if (matchedPairs === TOTAL_PAIRS) {
+    showGameComplete();
+  }
+}
+
+// Function to display game completion message
+function showGameComplete() {
+
+  // Create a container for the message
+  const messageContainer = document.createElement('div');
+  messageContainer.classList.add('completion-message');
+
+  // Add the message content
+  messageContainer.innerHTML = `
+    <h2>Congratulations!</h2>
+    <p>You found all the Pokémon pairs!</p>
+    <button id="play-again">Play Again</button>
+  `;
+
+  // Add to the page
+  document.querySelector('.container').appendChild(messageContainer);
+
+  // Set up the play again button
+  document.getElementById('play-again').addEventListener('click', () => {
+    messageContainer.remove();
+    resetGame();
+  });
 }
 
 
@@ -356,3 +395,9 @@ function hideLoading() {
 
 // Initialize the application when the DOM is loaded
 document.addEventListener('DOMContentLoaded', initApp);
+
+// Function to reset the game
+function resetGame() {
+  matchedPairs = 0;
+  initApp();
+}
