@@ -1,3 +1,21 @@
+# READ FIRST
+this is a game developed by RVCC for educational purposes.
+I, Alexx Peer implemented the code to make the game function, I am not responsible for creating the source code.
+
+## clone this repository
+
+https://github.com/RVCC-IDMX/pokemon-memory-game-Alexx-Peer.git
+
+
+
+
+
+
+
+
+
+
+
 # Pokémon Memory Game
 
 A fun, interactive browser-based memory matching game featuring Pokémon! Test your memory by finding pairs of matching Pokémon cards.
